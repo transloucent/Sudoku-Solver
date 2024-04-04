@@ -1,17 +1,3 @@
-import sys
-import time
-
-class recursionlimit:
-    def __init__(self, limit):
-        self.limit = limit
-
-    def __enter__(self):
-        self.old_limit = sys.getrecursionlimit()
-        sys.setrecursionlimit(self.limit)
-
-    def __exit__(self, type, value, tb):
-        sys.setrecursionlimit(self.old_limit)
-
 class SudokuBoard:
     
     def __init__(self, unsolved_board):
@@ -138,7 +124,7 @@ class SudokuBoard:
             
         return f"FORMATTED BOARD: \n{built_string}"
 
-
+'''
 def run():
     test_case = [[1,2,0,0,6,0,7,9,0],
                  [0,3,0,0,0,0,0,0,0],
@@ -156,3 +142,4 @@ def run():
 
 if __name__ == '__main__':
     run()
+'''
