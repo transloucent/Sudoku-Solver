@@ -1,9 +1,19 @@
 class SudokuBoard:
-    
-    def __init__(self, unsolved_board):
+    def __init__(self, unsolved_board=[[0,0,0,0,0,0,0,0,0],
+                                       [0,0,0,0,0,0,0,0,0],
+                                       [0,0,0,0,0,0,0,0,0],
+                                       [0,0,0,0,0,0,0,0,0],
+                                       [0,0,0,0,0,0,0,0,0],
+                                       [0,0,0,0,0,0,0,0,0],
+                                       [0,0,0,0,0,0,0,0,0],
+                                       [0,0,0,0,0,0,0,0,0],
+                                       [0,0,0,0,0,0,0,0,0]]):
         self.board = unsolved_board
         self.square_size = 3
         self.row_col_len = 9
+        
+    def insert_value(self, row, column, value):
+        self.board[row][column] = value
         
     def advance(self, row, col):
         if row == 8 and col == 8:
@@ -124,22 +134,21 @@ class SudokuBoard:
             
         return f"FORMATTED BOARD: \n{built_string}"
 
-'''
 def run():
-    test_case = [[1,2,0,0,6,0,7,9,0],
-                 [0,3,0,0,0,0,0,0,0],
-                 [4,5,6,0,0,0,0,0,0],
-                 [8,0,0,0,0,0,0,0,0],
-                 [0,0,0,0,0,0,0,0,0],
-                 [0,0,0,0,0,0,0,0,0],
-                 [9,0,0,0,0,0,0,0,0],
-                 [0,0,0,0,0,0,0,0,0],
-                 [6,0,0,0,0,0,0,0,0]]
+    # Creates the model for the board
+    model = SudokuBoard([
+            [1,2,0,0,6,0,7,9,0],
+             [0,3,0,0,0,0,0,0,0],
+             [4,5,6,0,0,0,0,0,0],
+             [8,0,0,0,1,2,0,0,0],
+             [0,0,0,0,0,0,0,0,0],
+             [0,0,0,0,0,0,0,0,0],
+             [0,0,0,0,0,0,0,0,0],
+             [9,0,0,0,0,0,0,0,0],
+             [6,0,0,0,0,0,0,0,0]])
+    model.solve_board()
+    print(model)
     
-    board = SudokuBoard(test_case)
-    board.solve_board()
-    print(board)
 
 if __name__ == '__main__':
     run()
-'''
