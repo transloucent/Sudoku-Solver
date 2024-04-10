@@ -1,4 +1,24 @@
 class SudokuBoard:
+    """
+    A class used to represent a SudokuBoard
+
+    ...
+    Attributes
+    ----------
+    board : list
+        A collection of lists of integers
+    square_size : int
+        The width/length of 1 square
+    row_col_len : int
+        The size of a row/column
+        
+    Methods
+    -------
+    advance(self, row, col)
+    
+    __str__()
+        String representation of the SudokuBoard
+    """
     def __init__(self, unsolved_board=[[0,0,0,0,0,0,0,0,0],
                                        [0,0,0,0,0,0,0,0,0],
                                        [0,0,0,0,0,0,0,0,0],
@@ -8,10 +28,23 @@ class SudokuBoard:
                                        [0,0,0,0,0,0,0,0,0],
                                        [0,0,0,0,0,0,0,0,0],
                                        [0,0,0,0,0,0,0,0,0]]):
+        """
+        Parameters
+        ----------
+        board : list, optional
+            A collection of lists of integers
+        """
+
         self.board = unsolved_board
         self.square_size = 3
         self.row_col_len = 9
         
+    def get_board(self):
+        return self.board
+    
+    def set_board(self, board):
+        self.board = board
+    
     def insert_value(self, row, column, value):
         self.board[row][column] = value
         
@@ -114,41 +147,29 @@ class SudokuBoard:
                 self.solve_board(row, col)
             
     def __str__(self):
+        """String representation of the SudokuBoard
+        """
         built_string = ""
         
+        # For loop that builds the rows of the board
+        # Adds dashes ( - ) to separate each 1/3rd of the board
         for i in range(len(self.board)):
             if i % self.square_size == 0:
-                    built_string += " - - - - - - - - - - \n"
+                built_string += " - - - - - - - - - - \n"
             
             built_string += " | "
             
+            # For loop that tracks each column
             for j in range(self.row_col_len):
                 built_string += f"{self.board[i][j]}"
                 
+                # Adds pipe ( | ) to separate each square
                 if (j + 1) % self.square_size == 0:
                     built_string += " | "
-                    
+            
+            # Drops to the next line       
             built_string += "\n"
             
         built_string += " - - - - - - - - - - \n"
             
         return f"FORMATTED BOARD: \n{built_string}"
-
-def run():
-    # Creates the model for the board
-    model = SudokuBoard([
-            [1,2,0,0,6,0,7,9,0],
-             [0,3,0,0,0,0,0,0,0],
-             [4,5,6,0,0,0,0,0,0],
-             [8,0,0,0,1,2,0,0,0],
-             [0,0,0,0,0,0,0,0,0],
-             [0,0,0,0,0,0,0,0,0],
-             [0,0,0,0,0,0,0,0,0],
-             [9,0,0,0,0,0,0,0,0],
-             [6,0,0,0,0,0,0,0,0]])
-    model.solve_board()
-    print(model)
-    
-
-if __name__ == '__main__':
-    run()
