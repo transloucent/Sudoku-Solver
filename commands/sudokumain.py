@@ -8,7 +8,8 @@ def run():
     model = SudokuBoard()
     
     # Creates the view by handing it the model
-    window = view.SudokuBoard(model)
+    app = QApplication([])
+    window = view.SudokuView(model)
     
     # Hands the model and view to the controller
     controller = control.SudokuController(model, window)
@@ -18,7 +19,6 @@ def run():
     window.show()
     
     # Launches the application
-    app = QApplication([])
     app.exec()
 
 if __name__ == '__main__':

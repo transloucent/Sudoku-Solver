@@ -14,11 +14,43 @@ class SudokuBoard:
         
     Methods
     -------
-    advance(self, row, col)
+    get_board()
+        Returns the board
     
+    set_board(board)
+        Sets the board
+        
+    advance(row, col)
+        Advances the row and column along the board
+    
+    decrement(row, col)
+        Decrements the row and column along the board
+        
+    validate_nums(row=-1, column=-1)
+        Validates if all the numbers in the row/column are unique
+        
+    check_row(row)
+        Checks the row for having unique values
+    
+    check_column(column)
+        Checks the column for having unique values
+    
+    check_square(square)
+        Validates if all the numbers in the square are unique
+    
+    def check_board()
+        Validates that the board is a correct Sudoku board
+    
+    is_solved()
+        Validates that the board is completely solved
+    
+    solve_board(row=0, col=0)
+        Solves the board using backtracking
+        
     __str__()
         String representation of the SudokuBoard
     """
+    
     def __init__(self, unsolved_board=[[0,0,0,0,0,0,0,0,0],
                                        [0,0,0,0,0,0,0,0,0],
                                        [0,0,0,0,0,0,0,0,0],
@@ -40,15 +72,27 @@ class SudokuBoard:
         self.row_col_len = 9
         
     def get_board(self):
+        """Returns the board
+
+        Returns:
+            A list of lists of integers
+        """
+        
         return self.board
     
     def set_board(self, board):
+        """Sets the board
+        """
+        
         self.board = board
-    
-    def insert_value(self, row, column, value):
-        self.board[row][column] = value
         
     def advance(self, row, col):
+        """Advances the row and column along the board
+
+        Returns:
+            The advanced row and column
+        """
+        
         if row == 8 and col == 8:
             col = 8
             row = 8
@@ -61,6 +105,12 @@ class SudokuBoard:
         return row, col
     
     def decrement(self, row, col):
+        """Decrements the row and column along the board
+
+        Returns:
+            The decremented row and column
+        """
+        
         if col == 0 and row != 0:
             col = 8
             row -= 1
@@ -70,6 +120,19 @@ class SudokuBoard:
         return row, col
         
     def validate_nums(self, row=-1, column=-1):
+        """Validates if all the numbers in the row/column are unique
+        
+        Parameters
+        ----------
+        row : integer, optional
+            The row to check for validation
+        column : integer, optional
+            The column to check for validation
+
+        Returns:
+            A boolean for whether or not the numbers in the row/column are unique
+        """
+        
         check = [0,0,0,0,0,0,0,0,0]
         
         for i in range(self.row_col_len):
@@ -87,22 +150,56 @@ class SudokuBoard:
         return True
         
     def check_row(self, row):
+        """Checks the row for having unique values
+
+        Returns:
+            The boolean of whether the row is all unique
+        """
+        
         return self.validate_nums(row=row)
     
     def check_column(self, column):
+        """Checks the column for having unique values
+
+        Returns:
+            The boolean of whether the column is all unique
+        """
+        
         return self.validate_nums(column=column)
     
     def check_square(self, square):
+        """Validates if all the numbers in the square are unique
+        
+        Parameters
+        ----------
+        square : integer
+            The numbered square (1 - 9) to check
+
+        Returns:
+            A boolean for whether or not the numbers in the square are unique
+        """
+        
         check = [0,0,0,0,0,0,0,0,0]
         
         for i in range(self.square_size):
+            # Calculates the row to use:
+            #   i : The current index
+            #   square : The square we are checking
+            #   square_size : The length/width of a Sudoku square (3)
             row = i + (((square - 1) // self.square_size) * self.square_size)
             
             for j in range(self.square_size):
+                # Calculates the row to use:
+                #   j : The current index
+                #   square : The square we are checking
+                #   square_size : The length/width of a Sudoku square (3)
                 column = j + self.square_size * (((square - 1) % self.square_size))
                 
                 num = self.board[row][column]
                 
+                # Checks to see if a number exists in the check array
+                # Continues or assigns a number if empty
+                # Returns False if otherwise
                 if num == 0:
                     continue
                 elif num != check[num - 1]:
@@ -113,6 +210,12 @@ class SudokuBoard:
         return True
     
     def check_board(self):
+        """Validates that the board is a correct Sudoku board
+
+        Returns:
+            A boolean for whether or not the board is valid
+        """
+        
         for i in range(self.row_col_len):
             check = self.check_row(i) and self.check_column(i) and self.check_square(i)
             if not check:
@@ -120,17 +223,39 @@ class SudokuBoard:
         return True
     
     def is_solved(self):
+        """Validates that the board is completely solved
+
+        Returns:
+            A boolean for whether or not the board is solved
+        """
+        
         for i in range(self.row_col_len):
             if 0 in self.board[i]:
                 return False
         return True
     
     def solve_board(self, row=0, col=0):
+        """Solves the board using backtracking
+        
+        Parameters
+        ----------
+        row : integer, optional
+            The current row being checked
+        column : integer, optional
+            The current column being checked
+        """
+        
+        # Checks if the board is not solved
         if not self.is_solved():
+            # Checks if the row, col pair has an existing number
             if self.board[row][col] == 0:
+                # Checks numbers 1 - 9 in each square
                 for num in range(1, 10):
                     self.board[row][col] = num
                 
+                    # If the board is valid, advance the row, 
+                    # solve through backtracking, and 
+                    # check if the board is solved
                     if self.check_board():
                         row, col = self.advance(row, col)
                         self.solve_board(row, col)
@@ -138,10 +263,12 @@ class SudokuBoard:
                         
                         if self.is_solved():
                             break
-                        
+                
+                # If the board is not solved, set the row, col to 0
                 if not self.is_solved():
                     self.board[row][col] = 0
-                    
+              
+            # Performed if there's a non-zero number exists in the board   
             else:
                 row, col = self.advance(row, col)
                 self.solve_board(row, col)
