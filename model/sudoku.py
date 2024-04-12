@@ -1,3 +1,6 @@
+from time import sleep
+from PyQt6.QtCore import pyqtSignal
+
 class SudokuBoard:
     """
     A class used to represent a SudokuBoard
@@ -50,6 +53,8 @@ class SudokuBoard:
     __str__()
         String representation of the SudokuBoard
     """
+    
+    dataChanged = pyqtSignal(int)  # Signal to emit when data changes
     
     def __init__(self, unsolved_board=[[0,0,0,0,0,0,0,0,0],
                                        [0,0,0,0,0,0,0,0,0],
@@ -234,6 +239,28 @@ class SudokuBoard:
                 return False
         return True
     
+    def translate_tile_to_view(self, row, column):
+        """Translates the row, column pair in the model to the correct location in the view
+
+         Parameters
+        ----------
+        row : int
+            The model's row 
+        column : int
+            The model's column 
+            
+        Returns:
+            The square's row/column within the view and the tile's position in the list
+        """
+        
+        # Retrives the row/col position in the 2D list in the view
+        square_row, square_col = row // self.square_size, column // self.square_size
+        
+        # Gets the position of the tile in the square
+        pos = self.square_size * (row % self.square_size) + (column % self.square_size)
+        
+        return square_row, square_col, pos
+    
     def solve_board(self, row=0, col=0):
         """Solves the board using backtracking
         
@@ -251,7 +278,10 @@ class SudokuBoard:
             if self.board[row][col] == 0:
                 # Checks numbers 1 - 9 in each square
                 for num in range(1, 10):
+                    # Updates the board so a human can visualize it
                     self.board[row][col] = num
+                    self.update_view(row, col, num)
+                    #sleep(0.5)
                 
                     # If the board is valid, advance the row, 
                     # solve through backtracking, and 
@@ -272,10 +302,38 @@ class SudokuBoard:
             else:
                 row, col = self.advance(row, col)
                 self.solve_board(row, col)
+                
+    def set_view(self, view):
+        """Adds a view to the model to be updated directly
+
+         Parameters
+        ----------
+        view : SudukoView
+            A view to be used to display updates to the model
+        """
+        
+        self.view = view
+                
+    def update_view(self, row, column, value):
+        """Displays updates in the model to the view
+
+         Parameters
+        ----------
+        row : int
+            The model's row 
+        column : int
+            The model's column 
+        value : int
+            The value to be displayed
+        """
+        
+        square_row, square_col, pos = self.translate_tile_to_view(row, column)
+        self.view.update_tile(square_row, square_col, pos, value)
             
     def __str__(self):
         """String representation of the SudokuBoard
         """
+        
         built_string = ""
         
         # For loop that builds the rows of the board

@@ -36,6 +36,17 @@ class SudokuTile(QPushButton):
                 color: white;
             }
         """)
+    
+    def set_text(self, text):
+        """Sets the text of the tile
+
+        Parameters
+        ----------
+        text : str
+            The value to set as the text of the tile
+        """
+        
+        self.setText(text)
 
     def keyPressEvent(self, event):
         """Registers the numbers 1-9 in Tile cell on key press
@@ -160,10 +171,14 @@ class SudokuView(QMainWindow):
     
     get_quit_button()
         Gets the quit button
-    
+        
+    validation_result_message(result)
+        Displays a message indicating the result of the validation check
+        
     shutdown()
         Executes the shutdown process
     """
+    
     def __init__(self, board):
         """
         Parameters
@@ -233,6 +248,40 @@ class SudokuView(QMainWindow):
         """
         
         return self.squares
+    
+    def update_tile(self, square_row, square_col, pos, value):
+        """Updates the current tile text with the provided value
+
+        Parameters:
+        -----------
+            square_row : int
+                The SudokuSquare row location
+            square_col : int
+                The SudokuSquare column location
+            pos : int
+                The position in the SudokuSquare list
+            value : int
+                The value to update the SudokuTile with
+        """
+        
+        self.squares[square_row][square_col].get_list()[pos].set_text(str(value))
+    
+    def validation_result_message(self, result):
+        """Displays a message indicating the result of the validation check
+        
+        Parameters
+        ----------
+        result : boolean
+            The result of the validation
+        """
+        
+        if result:
+            QMessageBox.information(self, "Success!", "This is a valid Sudoku board",
+                                    QMessageBox.StandardButton.Ok)
+        else:
+            QMessageBox.critical(self, "Error!", "This is not a valid Sudoku board. Please correct it before moving forward.",
+                                    QMessageBox.StandardButton.Ok)
+        
     
     def shutdown(self):
         """Executes the shutdown process
