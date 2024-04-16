@@ -1,3 +1,5 @@
+from worker.worker import Worker
+
 class SudokuController:
     """
     A class used to represent a SudokuController
@@ -37,6 +39,26 @@ class SudokuController:
         self.model = model
         self.view = view
         self.square_constant = 3
+        
+        # Connect signal to change method
+        self.model.elementChanged.connect(self.on_model_changed)
+        
+    def on_model_changed(self, row, col, pos, value):
+        """Handles the view update from the model
+        
+        Parameters
+        ----------
+        row : int
+            Row index of the view's 2D array
+        col : int
+            Column index of the view's 2D array
+        pos : int
+            Position in the 1D array to update
+        value : int
+            Value to replace in the board
+        """
+        
+        self.view.update_tile(row, col, pos, value)
     
     def register_buttons(self):
         """Allows the buttons on the board to be clicked
@@ -77,8 +99,9 @@ class SudokuController:
             self.view.validation_result_message(False)
             return
 
-        # Solves the board
-        self.model.solve_board()
+        # Creates and starts a worker thread
+        self.worker = Worker(self.model)
+        self.worker.start()
     
     def view_to_model_board(self):
         """Translates the 2D board from the view to a 2D board for the model

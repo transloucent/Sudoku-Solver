@@ -7,14 +7,9 @@ def run():
     # Establishes PyQt
     app = QApplication([])
     
-    # Creates the model for the board
+    # Creates the model and view for the board
     model = SudokuBoard()
-    
-    # Creates the view, handing it the model
-    window = view.SudokuView(model)
-    
-    # Sets the view for the model to update
-    model.set_view(window)
+    window = view.SudokuView()
     
     # Hands the model and view to the controller, registers view's buttons
     controller = control.SudokuController(model, window)

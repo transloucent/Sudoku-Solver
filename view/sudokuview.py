@@ -179,7 +179,7 @@ class SudokuView(QMainWindow):
         Executes the shutdown process
     """
     
-    def __init__(self, board):
+    def __init__(self):
         """
         Parameters
         ----------
@@ -187,7 +187,14 @@ class SudokuView(QMainWindow):
             A list of lists of integers from the model
         """
         
+        # Establishes board and UI
         super().__init__()
+        self.init_ui()
+        
+    def init_ui(self):
+        """Initializes the UI for the Sudoku board
+        """
+        
         self.setWindowTitle("Sudoku Solver")
         self.setFixedSize(550, 550)  # Adjusted for spacing and margins
 

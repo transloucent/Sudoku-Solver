@@ -1,7 +1,7 @@
 from time import sleep
-from PyQt6.QtCore import pyqtSignal
+from PyQt6.QtCore import pyqtSignal, QObject
 
-class SudokuBoard:
+class SudokuBoard(QObject):
     """
     A class used to represent a SudokuBoard
 
@@ -54,7 +54,7 @@ class SudokuBoard:
         String representation of the SudokuBoard
     """
     
-    dataChanged = pyqtSignal(int)  # Signal to emit when data changes
+    elementChanged = pyqtSignal(int, int, int, int)  # Signal to emit when data changes
     
     def __init__(self, unsolved_board=[[0,0,0,0,0,0,0,0,0],
                                        [0,0,0,0,0,0,0,0,0],
@@ -71,6 +71,8 @@ class SudokuBoard:
         board : list, optional
             A collection of lists of integers
         """
+        
+        super().__init__()
 
         self.board = unsolved_board
         self.square_size = 3
@@ -90,6 +92,9 @@ class SudokuBoard:
         """
         
         self.board = board
+        
+    def get_element_changed(self):
+        return self.elementChanged
         
     def advance(self, row, col):
         """Advances the row and column along the board
@@ -130,9 +135,9 @@ class SudokuBoard:
         Parameters
         ----------
         row : integer, optional
-            The row to check for validation
+            The row to check for validation, default -1 
         column : integer, optional
-            The column to check for validation
+            The column to check for validation, default -1 
 
         Returns:
             A boolean for whether or not the numbers in the row/column are unique
@@ -141,11 +146,14 @@ class SudokuBoard:
         check = [0,0,0,0,0,0,0,0,0]
         
         for i in range(self.row_col_len):
+            # Checks for which row/column should be validated
             if row == -1:
                 num = self.board[i][column - 1]
             else:
                 num = self.board[row - 1][i]
             
+            # Ensures every number in the check array is unique
+            # Boolean returned upon successful or unsuccessful validation
             if num == 0:
                 continue
             elif num != check[num - 1]:
@@ -281,7 +289,8 @@ class SudokuBoard:
                     # Updates the board so a human can visualize it
                     self.board[row][col] = num
                     self.update_view(row, col, num)
-                    #sleep(0.5)
+                    #sleep(0.1)
+                    
                 
                     # If the board is valid, advance the row, 
                     # solve through backtracking, and 
@@ -303,17 +312,6 @@ class SudokuBoard:
                 row, col = self.advance(row, col)
                 self.solve_board(row, col)
                 
-    def set_view(self, view):
-        """Adds a view to the model to be updated directly
-
-         Parameters
-        ----------
-        view : SudukoView
-            A view to be used to display updates to the model
-        """
-        
-        self.view = view
-                
     def update_view(self, row, column, value):
         """Displays updates in the model to the view
 
@@ -328,7 +326,7 @@ class SudokuBoard:
         """
         
         square_row, square_col, pos = self.translate_tile_to_view(row, column)
-        self.view.update_tile(square_row, square_col, pos, value)
+        self.elementChanged.emit(square_row, square_col, pos, value)
             
     def __str__(self):
         """String representation of the SudokuBoard
