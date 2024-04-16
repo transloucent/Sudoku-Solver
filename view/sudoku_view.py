@@ -1,149 +1,6 @@
-from PyQt6.QtWidgets import *
-from PyQt6.QtCore import QSize, Qt
-
-class SudokuTile(QPushButton):
-    """
-    A class used to represent a SudokuTile object
-
-    ...
-    
-    Methods
-    -------
-    keyPressEvent(event)
-        Registers the numbers 1-9 on key press
-
-    mousePressEvent(event)
-        Highlights the current tile position 
-    
-    __str__()
-        String representation of the SudokuTile object
-    """
-    
-    def __init__(self):
-        super().__init__()
-        self.setFixedSize(50, 50)  # Fixed size for each tile
-        self.setText("")  # Start with an empty text
-        self.hasFocus = False  # Flag to track focus state
-        
-        # Style adjustments
-        self.setStyleSheet("""
-            QPushButton {
-                border: 1px solid black;
-                font-size: 16px;
-            }
-            QPushButton:focus {
-                background-color: #81CFED;
-                color: white;
-            }
-        """)
-    
-    def set_text(self, text):
-        """Sets the text of the tile
-
-        Parameters
-        ----------
-        text : str
-            The value to set as the text of the tile
-        """
-        
-        self.setText(text)
-
-    def keyPressEvent(self, event):
-        """Registers the numbers 1-9 in Tile cell on key press
-        
-        Parameters
-        ----------
-        event : QMouseEvent
-            A mouse click
-        """
-        
-        key = event.key()
-        if 49 <= key <= 57:  # ASCII values for digits 1-9
-            digit = chr(key)
-            self.setText(digit)
-
-    def mousePressEvent(self, event):
-        """Highlights the current tile position
-        
-        Parameters
-        ----------
-        event : QMouseEvent
-            A mouse click
-        """
-        
-        if self.hasFocus:
-            self.clearFocus()  # Clear focus to remove highlight
-            self.hasFocus = False
-        else:
-            self.setFocus()  # Set focus to highlight
-            self.hasFocus = True
-        super().mousePressEvent(event)
-    
-    def __str__(self):
-        """String representation of the SudokuTile object
-        
-        Returns:
-            A string of the SudokuTile
-        """
-        
-        return self.text()
-
-class SudokuSquare(QWidget):
-    """
-    A class used to represent a SudokuSquare object
-
-    ...
-
-    Attributes
-    ----------
-    square: list
-        A collection of SudokuTile objects
-    
-    Methods
-    -------
-    get_list()
-        Returns the list of SudokuTiles inside the SudokuSquare
-    
-    __str__()
-        String representation of the SudokuSquare object
-    """
-    
-    def __init__(self):
-        super().__init__()
-        self.setFixedSize(QSize(156, 156))  # Adjust the size to fit 3x3 SudokuTile widgets plus spacing
-
-        # Establishes the layout of the SudokuSquare object
-        self.layout = QGridLayout()
-        self.setLayout(self.layout)
-        self.layout.setContentsMargins(0, 0, 0, 0)
-        self.layout.setSpacing(2)  # Minimal spacing between tiles for visual separation
-        self.square = []
-
-        # Initialize and add SudokuTile widgets to the layout
-        for j in range(3):
-            for k in range(3):
-                tile = SudokuTile()
-                self.square.append(tile)
-                self.layout.addWidget(tile, j, k)
-    
-    def get_list(self):
-        """Returns the list of SudokuTiles inside the SudokuSquare
-        
-        Returns:
-            A list of SudukoTiles
-        """
-        
-        return self.square
-    
-    def __str__(self):
-        """String representation of the SudokuSquare object
-        
-        Returns:
-            A string of the current SudokuSquare object
-        """
-        
-        return " ".join([f"{self.square[tile]}" if self.square[tile].text() != "" else "0" for tile in range(len(self.square))])
-
+from PyQt6.QtWidgets import QMainWindow, QWidget, QGridLayout, QPushButton, QGridLayout, QMessageBox
+from PyQt6.QtGui import QIcon
+from view.sudoku_square import SudokuSquare
 
 class SudokuView(QMainWindow):
     """
@@ -160,9 +17,9 @@ class SudokuView(QMainWindow):
     
     Methods
     -------
-    get_squares()
-        Returns a 2D list of SudokuSquares
-        
+    init_ui()
+        Initializes the UI for the Sudoku board
+    
     get_validate_button()
         Gets the validate button
     
@@ -171,10 +28,16 @@ class SudokuView(QMainWindow):
     
     get_quit_button()
         Gets the quit button
-        
+    
+    get_squares()
+        Gets a 2D list of SudokuSquares
+    
+    update_tile(square_row, square_col, pos, value)
+        Updates the current tile text with the provided value
+    
     validation_result_message(result)
         Displays a message indicating the result of the validation check
-        
+    
     shutdown()
         Executes the shutdown process
     """
@@ -195,6 +58,8 @@ class SudokuView(QMainWindow):
         """Initializes the UI for the Sudoku board
         """
         
+        # Establishes window elements
+        self.setWindowIcon(QIcon('../assets/sudoku_icon.png'))
         self.setWindowTitle("Sudoku Solver")
         self.setFixedSize(550, 550)  # Adjusted for spacing and margins
 
@@ -271,7 +136,10 @@ class SudokuView(QMainWindow):
                 The value to update the SudokuTile with
         """
         
-        self.squares[square_row][square_col].get_list()[pos].set_text(str(value))
+        if value == 0:
+            self.squares[square_row][square_col].get_list()[pos].set_text("")
+        else:
+            self.squares[square_row][square_col].get_list()[pos].set_text(str(value))
     
     def validation_result_message(self, result):
         """Displays a message indicating the result of the validation check
@@ -300,4 +168,3 @@ class SudokuView(QMainWindow):
          
         if reply == QMessageBox.StandardButton.Yes:
             self.close()
-            print('Window closed')

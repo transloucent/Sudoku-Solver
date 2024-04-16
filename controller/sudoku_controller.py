@@ -16,11 +16,23 @@ class SudokuController:
         
     Methods
     -------
+    on_model_changed(row, col, pos, value)
+        Handles the view update from the model
+    
     register_buttons()
         Allows the buttons on the board to be clicked
         
+    enable_buttons()
+        Enable all buttons
+    
+    disable_buttons()
+        Disable all buttons
+        
     validate_board()
         Validates the current board displayed in the view
+        
+    solve_board()
+        Solves the board displayed in the view
     
     view_to_model_board()
         Translates the 2D board from the view to a 2D board for the model
@@ -68,6 +80,20 @@ class SudokuController:
         self.view.get_solve_button().clicked.connect(self.solve_board)
         self.view.get_quit_button().clicked.connect(self.view.shutdown)
         
+    def enable_buttons(self):
+        """Enable all buttons
+        """
+        
+        self.view.get_validate_button().setDisabled(False)
+        self.view.get_solve_button().setDisabled(False)
+    
+    def disable_buttons(self):
+        """Disable all buttons
+        """
+        
+        self.view.get_validate_button().setDisabled(True)
+        self.view.get_solve_button().setDisabled(True)
+        
     def validate_board(self):
         """Validates the current board displayed in the view
         """
@@ -100,7 +126,7 @@ class SudokuController:
             return
 
         # Creates and starts a worker thread
-        self.worker = Worker(self.model)
+        self.worker = Worker(self.model, self)
         self.worker.start()
     
     def view_to_model_board(self):
@@ -117,9 +143,11 @@ class SudokuController:
         # Can be used to check if the board is correct or can be used to solve the board
         board = [[] for _ in range(len(condensed))]
         
+        # Variables for board translation
         row, col = 0, 0
         offset_row, offset_col = 0, 0
         
+        # For loop that determines the offests to use for translating the board
         for square in range(len(condensed)):
             offset_row = self.square_constant * (square // self.square_constant)
             
@@ -128,6 +156,7 @@ class SudokuController:
                 row = offset_row + (num // self.square_constant)
                 col = offset_col + (num % self.square_constant)
                 
+                # Appends values to the board at the specified index
                 if condensed[square].get_list()[num].text() == "":
                     board[row].append(0)
                 else:

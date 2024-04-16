@@ -1,5 +1,5 @@
-from time import sleep
 from PyQt6.QtCore import pyqtSignal, QObject
+from time import sleep
 
 class SudokuBoard(QObject):
     """
@@ -47,14 +47,21 @@ class SudokuBoard(QObject):
     is_solved()
         Validates that the board is completely solved
     
+    translate_tile_to_view(row, column)
+        Translates the row, column pair in the model to the correct location in the view
+    
     solve_board(row=0, col=0)
         Solves the board using backtracking
+                
+    update_view(row, column, value)
+        Displays updates in the model to the view
         
     __str__()
         String representation of the SudokuBoard
     """
     
-    elementChanged = pyqtSignal(int, int, int, int)  # Signal to emit when data changes
+    # Signal to emit when data changes
+    elementChanged = pyqtSignal(int, int, int, int)
     
     def __init__(self, unsolved_board=[[0,0,0,0,0,0,0,0,0],
                                        [0,0,0,0,0,0,0,0,0],
@@ -93,9 +100,6 @@ class SudokuBoard(QObject):
         
         self.board = board
         
-    def get_element_changed(self):
-        return self.elementChanged
-        
     def advance(self, row, col):
         """Advances the row and column along the board
 
@@ -103,6 +107,7 @@ class SudokuBoard(QObject):
             The advanced row and column
         """
         
+        # Used first if in statement to continuously check the last position on the board
         if row == 8 and col == 8:
             col = 8
             row = 8
@@ -289,8 +294,7 @@ class SudokuBoard(QObject):
                     # Updates the board so a human can visualize it
                     self.board[row][col] = num
                     self.update_view(row, col, num)
-                    #sleep(0.1)
-                    
+                    sleep(0.05)
                 
                     # If the board is valid, advance the row, 
                     # solve through backtracking, and 
@@ -306,6 +310,7 @@ class SudokuBoard(QObject):
                 # If the board is not solved, set the row, col to 0
                 if not self.is_solved():
                     self.board[row][col] = 0
+                    self.update_view(row, col, 0)
               
             # Performed if there's a non-zero number exists in the board   
             else:

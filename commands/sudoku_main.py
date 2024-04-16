@@ -1,7 +1,7 @@
-from model.sudoku import SudokuBoard
+from model.sudoku_board import SudokuBoard
 from PyQt6.QtWidgets import QApplication 
-import view.sudokuview as view
-import controller.sudokucontroller as control
+import view.sudoku_view as view
+import controller.sudoku_controller as control
 
 def run():
     # Establishes PyQt
